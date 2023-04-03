@@ -1,0 +1,23 @@
+{
+  "name": "expressjs-lapiscine-coworking",
+  "version": "1.0.0",
+  "description": "Project to learn expressjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaulDoazan/ExpressJS-LAPISCINE-Coworking.git"
+  },
+  "author": "PaulD",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PaulDoazan/ExpressJS-LAPISCINE-Coworking/issues"
+  },
+  "homepage": "https://github.com/PaulDoazan/ExpressJS-LAPISCINE-Coworking#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
