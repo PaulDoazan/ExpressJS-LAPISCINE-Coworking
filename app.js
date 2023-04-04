@@ -14,6 +14,7 @@ const coworkings = require('./mock-coworkings');
 app
     .use(morgan('dev'))
     .use(serveFavicon(__dirname + '/favicon.ico'))
+    .use(express.json())
 
 app.get('/api/coworkings', (req, res) => {
     // Renvoyer tous les coworkings au format json, uniquement ceux dont la surface est supérieure à 500
@@ -21,19 +22,7 @@ app.get('/api/coworkings', (req, res) => {
     const result = coworkings.filter(element => element.superficy > limit);
 
     const msg = `La liste des coworkings a bien été retournée.`
-    res.json({ message: msg, data: result })
-})
-
-app.get('/api/users', (req, res) => {
-    res.json({})
-})
-
-app.get('/api/reviews', (req, res) => {
-    res.json({})
-})
-
-app.get('/api/reviews/:id', (req, res) => {
-    res.json({})
+    res.json({ message: msg, data: coworkings })
 })
 
 app.get('/api/coworkings/:id', (req, res) => {
@@ -50,6 +39,21 @@ app.get('/api/coworkings/:id', (req, res) => {
     }
 
     res.json(result)
+})
+
+app.post('/api/coworkings', (req, res) => {
+    // ajouter un message à l'ajout du coworking
+    // ajouter dynamiquement un id unique
+    let newCoworking = req.body;
+
+    let newId = coworkings[coworkings.length - 1].id + 1;
+
+    newCoworking.id = newId;
+    coworkings.push(newCoworking);
+
+
+    const msg = 'Un coworking a bien été ajouté.'
+    res.json({ message: 'Un coworking a bien été ajouté.', data: newCoworking })
 })
 
 app.listen(port, () => {
