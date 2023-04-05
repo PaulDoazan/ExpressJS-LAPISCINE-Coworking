@@ -4,7 +4,7 @@ const serveFavicon = require('serve-favicon')
 const app = express()
 const port = 3000
 
-const coworkings = require('./mock-coworkings');
+let coworkings = require('./mock-coworkings');
 
 // const logger = (req, res, next) => {
 //     console.log(`URL : ${req.url}`)
@@ -42,10 +42,7 @@ app.get('/api/coworkings/:id', (req, res) => {
 })
 
 app.post('/api/coworkings', (req, res) => {
-    // ajouter un message à l'ajout du coworking
-    // ajouter dynamiquement un id unique
     let newCoworking = req.body;
-
     let newId = coworkings[coworkings.length - 1].id + 1;
 
     newCoworking.id = newId;
@@ -54,6 +51,54 @@ app.post('/api/coworkings', (req, res) => {
 
     const msg = 'Un coworking a bien été ajouté.'
     res.json({ message: 'Un coworking a bien été ajouté.', data: newCoworking })
+})
+
+app.put('/api/coworkings/:id', (req, res) => {
+    // récupérer dans le tableau coworkings le coworking qui correspond à l'id dans les params de la requête
+    let coworkingToModify = coworkings.find(coworking => coworking.id == req.params.id)
+
+    // Si le coworking n'existe pas, on renvoie une erreur 404 avec un message
+    if (!coworkingToModify) {
+        const msg = `Le coworking n°${req.params.id} n'existe pas.`
+        return res.status(404).json({ message: msg })
+    }
+
+    coworkingToModify = { ...coworkingToModify, ...req.body }
+
+    // remplacer dans le tableau coworkings l'ancien coworking 16 avec coworkingToModify
+
+    // for (let i = 0; i < coworkings.length; i++) {
+    //     if (coworkings[i].id == coworkingToModify.id) {
+    //         coworkings[i] = coworkingToModify
+    //         break;
+    //     }
+    // }
+
+    let index = coworkings.findIndex((el) => el.id == coworkingToModify.id);
+    coworkings[index] = coworkingToModify;
+
+    res.json(coworkings)
+})
+
+app.delete('/api/coworkings/:id', (req, res) => {
+    // 1. Récupère dans le tableau le coworking qui correspond à l'id en paramètre
+    const coworkingToDelete = coworkings.find(el => el.id == req.params.id)
+
+    // 2. S'il n'existe pas, erreur 404
+    if (!coworkingToDelete) {
+        return res.status(404).json({ message: `Aucun coworking ne correspond à l'id ${req.params.id}` })
+    }
+
+    // 3. On renvoie un nouveau tableau qui ne contiendra plus l'élément qui correspond à l'id
+    let coworkingsUpdated = []
+    coworkings.forEach((el) => {
+        if (el.id != coworkingToDelete.id) {
+            coworkingsUpdated.push(el)
+        }
+    })
+
+    coworkings = coworkingsUpdated;
+    res.json(coworkings)
 })
 
 app.listen(port, () => {
