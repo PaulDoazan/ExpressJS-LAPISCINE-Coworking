@@ -49,6 +49,7 @@ exports.updateCoworking = (req, res) => {
     let index = coworkings.findIndex((el) => el.id == coworkingToModify.id);
     coworkings[index] = coworkingToModify;
 
+    console.log(req.body)
     res.json(coworkings)
 }
 
