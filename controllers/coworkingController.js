@@ -1,4 +1,6 @@
 let coworkings = require('../mock-coworkings');
+const { Coworking } = require('../db/sequelize')
+
 
 exports.findAllCoworkings = (req, res) => {
     // Renvoyer tous les coworkings au format json, uniquement ceux dont la surface est supérieure à 500
@@ -76,12 +78,22 @@ exports.deleteCoworking = (req, res) => {
 
 exports.createCoworking = (req, res) => {
     let newCoworking = req.body;
-    let newId = coworkings[coworkings.length - 1].id + 1;
+    console.log(req.body);
+    // let newId = coworkings[coworkings.length - 1].id + 1;
 
-    newCoworking.id = newId;
-    coworkings.push(newCoworking);
+    // newCoworking.id = newId;
+    // coworkings.push(newCoworking);
 
-
-    const msg = 'Un coworking a bien été ajouté.'
-    res.json({ message: 'Un coworking a bien été ajouté.', data: newCoworking })
+    Coworking.create({
+        name: req.body.name,
+        price: req.body.price,
+        address: req.body.address,
+        picture: req.body.picture,
+        superficy: req.body.superficy,
+        capacity: req.body.capacity
+    }).then(() => {
+        const msg = 'Un coworking a bien été ajouté.'
+        res.json({ message: msg, data: newCoworking })
+    }).catch(error => res.json(error))
+    res.json(req.body)
 }
