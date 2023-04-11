@@ -1,22 +1,34 @@
 let coworkings = require('../mock-coworkings');
+const { Op } = require('sequelize');
 const { CoworkingModel } = require('../db/sequelize')
 
 
 exports.findAllCoworkings = (req, res) => {
-    // Renvoyer tous les coworkings au format json, uniquement ceux dont la surface est supérieure à 500
-    const limit = req.query.limit || 200
-    // const result = coworkings.filter(element => element.superficy > limit);
-
-    // utiliser le model Coworking pour lister tous les coworkings existants dans la bdd... findAll()
-    CoworkingModel.findAll()
+    if(req.query.search){
+        // notre recherche avec paramètres
+        CoworkingModel.findAll({ where: { name: {[Op.like] : `%${req.query.search}%`} } })
+        .then((elements)=>{
+            if(!elements.length){
+                return res.json({message: "Aucun coworking ne correspond à votre recherche"})    
+            }
+            const msg = 'La liste des coworkings a bien été récupérée en base de données.'
+            res.json({message: msg, data: elements})
+        })
+        .catch((error) => {
+            const msg = 'Une erreur est survenue.'
+            res.status(500).json({message: msg})
+        })
+    } else {
+        CoworkingModel.findAll()
         .then((elements)=>{
             const msg = 'La liste des coworkings a bien été récupérée en base de données.'
             res.json({message: msg, data: elements})
         })
         .catch((error) => {
             const msg = 'Une erreur est survenue.'
-            res.json({message: msg})
+            res.status(500).json({message: msg})
         })
+    }
 }
 
 exports.findCoworkingByPk = (req, res) => {
