@@ -63,7 +63,10 @@ exports.updateCoworking = (req, res) => {
             const msg = "Le coworking a bien été modifié."
             res.json({message: msg, data: coworking})
         }
-    }).catch(() => {
+    }).catch((error) => {
+        if(error instanceof UniqueConstraintError || error instanceof ValidationError){
+            return res.status(400).json({message: error.message, data: error})
+        } 
         const msg = "Impossible de mettre à jour le coworking."
         res.json({message: msg})
     })
@@ -102,9 +105,9 @@ exports.createCoworking = (req, res) => {
         picture: newCoworking.picture,
         superficy: newCoworking.superficy,
         capacity: newCoworking.capacity
-    }).then(() => {
+    }).then((el) => {
         const msg = 'Un coworking a bien été ajouté.'
-        res.json({ message: msg, data: newCoworking })
+        res.json({ message: msg, data: el })
     }).catch(error => {
         if(error instanceof UniqueConstraintError || error instanceof ValidationError){
             return res.status(400).json({message: error.message, data: error})
