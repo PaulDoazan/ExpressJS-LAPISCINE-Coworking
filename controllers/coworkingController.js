@@ -1,5 +1,5 @@
 let coworkings = require('../mock-coworkings');
-const { Coworking } = require('../db/sequelize')
+const { CoworkingModel } = require('../db/sequelize')
 
 
 exports.findAllCoworkings = (req, res) => {
@@ -8,7 +8,7 @@ exports.findAllCoworkings = (req, res) => {
     // const result = coworkings.filter(element => element.superficy > limit);
 
     // utiliser le model Coworking pour lister tous les coworkings existants dans la bdd... findAll()
-    Coworking.findAll()
+    CoworkingModel.findAll()
         .then((elements)=>{
             const msg = 'La liste des coworkings a bien été récupérée en base de données.'
             res.json({message: msg, data: elements})
@@ -21,20 +21,25 @@ exports.findAllCoworkings = (req, res) => {
 
 exports.findCoworkingByPk = (req, res) => {
     // Afficher le coworking correspondant à l'id en params, en le récupérant dans la bdd     findByPk()
-    Coworking.findByPk(req.params.id)
-        .then(() => {
-            const msg = `Le coworking n° a bien été récupéré.`
-            res.json({message: msg})
+    CoworkingModel.findByPk(req.params.id)
+        .then(coworking => {
+            if (coworking === null) {
+                const message = `Le coworking demandé n'existe pas.`
+                res.status(404).json({ message })
+            } else {
+                const message = "Un coworking a bien été trouvé."
+                res.json({ message, data: coworking });
+            }
         })
-        .catch(() => {
-            const msg = `Aucun coworking ne correspond à l'id n°${req.params.id}.`
-            res.json({message: msg})
+        .catch(error => {
+            const message = `La liste des coworkings n'a pas pu se charger. Reessayez ulterieurement.`
+            res.status(500).json({ message, data: error })
         })
 }
 
 exports.updateCoworking = (req, res) => {
     // Modifier le coworking en base de données qui correspond à l'id spécifé dans les params
-    Coworking.update(req.body, {
+    CoworkingModel.update(req.body, {
         where: {
             id: req.params.id
         }
@@ -53,24 +58,26 @@ exports.updateCoworking = (req, res) => {
 }
 
 exports.deleteCoworking = (req, res) => {
-    // 1. Récupère dans le tableau le coworking qui correspond à l'id en paramètre
-    const coworkingToDelete = coworkings.find(el => el.id == req.params.id)
-
-    // 2. S'il n'existe pas, erreur 404
-    if (!coworkingToDelete) {
-        return res.status(404).json({ message: `Aucun coworking ne correspond à l'id ${req.params.id}` })
-    }
-
-    // 3. On renvoie un nouveau tableau qui ne contiendra plus l'élément qui correspond à l'id
-    let coworkingsUpdated = []
-    coworkings.forEach((el) => {
-        if (el.id != coworkingToDelete.id) {
-            coworkingsUpdated.push(el)
-        }
-    })
-
-    coworkings = coworkingsUpdated;
-    res.json(coworkings)
+    CoworkingModel.findByPk(req.params.id)
+        .then(coworking => {
+            if (coworking === null) {
+                const message = `Le coworking demandé n'existe pas.`
+                return res.status(404).json({ message })
+            }
+            return CoworkingModel.destroy({
+                where: {
+                    id: req.params.id
+                }
+            })
+                .then(() => {
+                    const message = `Le coworking ${coworking.name} a bien été supprimé.`
+                    res.json({ message, data: coworking });
+                })
+        })
+        .catch(error => {
+            const message = `Impossible de supprimer le coworking.`
+            res.status(500).json({ message, data: error })
+        })
 }
 
 exports.createCoworking = (req, res) => {

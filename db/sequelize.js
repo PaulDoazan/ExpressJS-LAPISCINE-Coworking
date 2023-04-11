@@ -1,5 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const CoworkingModel = require('../models/coworking')
+const CoworkingModelSequelize = require('../models/coworking')
 const coworkings = require('../mock-coworkings');
 
 const sequelize = new Sequelize('lapiscine_coworking', 'root', '', {
@@ -8,7 +8,7 @@ const sequelize = new Sequelize('lapiscine_coworking', 'root', '', {
     logging: false
 });
 
-const Coworking = CoworkingModel(sequelize, DataTypes)
+const CoworkingModel = CoworkingModelSequelize(sequelize, DataTypes)
 
 const initDb = () => {
     return sequelize.sync({ force: true }) 
@@ -16,7 +16,7 @@ const initDb = () => {
         // création des 11 coworkings dans la bdd, avec une boucle, 
         // message à afficher en console : La liste des {11} coworkings a bien été créée.
         coworkings.forEach((element) => {
-            Coworking.create({
+            CoworkingModel.create({
                 name: element.name,
                 price: element.price,
                 address: element.address,
@@ -34,5 +34,5 @@ sequelize.authenticate()
 
 
 module.exports = {
-    sequelize, Coworking, initDb
+    sequelize, CoworkingModel, initDb
 }
