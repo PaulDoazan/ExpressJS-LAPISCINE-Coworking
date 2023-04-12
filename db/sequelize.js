@@ -44,7 +44,7 @@ const initDb = () => {
                 password: hash
             })
         })
-        .catch(err => console.log(err))    
+        .catch(err => console.log(err))
     })
     .catch(error => console.log('Erreur'))
 }
@@ -55,5 +55,5 @@ sequelize.authenticate()
 
 
 module.exports = {
-    sequelize, CoworkingModel, initDb
+    sequelize, CoworkingModel, UserModel, initDb
 }
