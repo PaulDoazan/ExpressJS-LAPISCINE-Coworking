@@ -40,6 +40,28 @@ exports.login = (req, res) => {
         })
 }
 
+exports.signup = (req, res) => {
+    // 1. on récupère le password dans le body et on le hash .then()
+    bcrypt.hash(req.body.password, 10)
+        .then(hash => {
+            return UserModel.create({
+                username: req.body.username,
+                password: hash
+            }).then((userCreated) => {
+                const message = `L'utilisateur ${userCreated.username} a bien été créé` 
+                userCreated.password = 'hidden';
+                return res.json({message, data: userCreated})
+            })
+        })
+        .catch(error => {
+            if(error instanceof UniqueConstraintError || error instanceof ValidationError){
+                return res.status(400).json({message: error.message, data: error})
+            } 
+            const message = "Un problème est survenu lors de la création du profil"
+            return res.status(500).json({message, data:error})
+        })
+}
+
 exports.protect = (req, res, next) => {
     const authorizationHeader = req.headers.authorization
 
@@ -51,11 +73,29 @@ exports.protect = (req, res, next) => {
     try {
         const token = authorizationHeader.split(' ')[1];
         const decoded = jwt.verify(token, privateKey)
-        console.log(decoded)
+        req.userId = decoded.data
     } catch (err) {
         const message = "Jeton invalide"
         return res.status(403).json({message, data: err})
     }
     
     return next();
+}
+
+exports.restrictTo = (...roles) => {
+    return (req, res, next) => {
+        UserModel.findByPk(req.userId)
+            .then(user => { 
+                console.log(user.username, user.id, roles) 
+                if(!user || !roles.every(role => user.roles.includes(role))){
+                    const message = "Droits insuffisants";
+                    return res.status(403).json({message}) 
+                }
+                return next();
+            })
+            .catch(err => {
+                const message = "Erreur lors de l'autorisation"
+                res.status(500).json({message, data: err})
+            })    
+    }
 }

@@ -11,8 +11,8 @@ router
     .route('/login')
     .post(authController.login)
 
-// router
-//     .route('/:id')
-//     .get(coworkingController.findCoworkingByPk)
+router
+    .route('/signup')
+    .post(authController.signup)
 
 module.exports = router;
