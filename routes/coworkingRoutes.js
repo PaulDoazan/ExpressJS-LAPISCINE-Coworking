@@ -12,6 +12,6 @@ router
     .route('/:id')
     .get(coworkingController.findCoworkingByPk)
     .put(authController.protect, coworkingController.updateCoworking)
-    .delete(coworkingController.deleteCoworking)
+    .delete(authController.protect, coworkingController.deleteCoworking)
 
 module.exports = router; 

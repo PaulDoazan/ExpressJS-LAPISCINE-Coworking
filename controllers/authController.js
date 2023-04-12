@@ -2,6 +2,7 @@ const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
 const { UserModel } = require('../db/sequelize')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const privateKey = require('../auth/private_key')
 
 exports.login = (req, res) => {
     if(!req.body.username || !req.body.password){
@@ -26,7 +27,7 @@ exports.login = (req, res) => {
                     // json web token
                     const token = jwt.sign({
                         data: user.id
-                      }, 'mon_petit_secret', { expiresIn: '1h' });
+                      }, privateKey, { expiresIn: '1h' });
 
                     const msg = "L'utilisateur a été connecté avec succès."
                     user.password = "hidden"
@@ -49,7 +50,8 @@ exports.protect = (req, res, next) => {
 
     try {
         const token = authorizationHeader.split(' ')[1];
-        const decoded = jwt.verify(token, 'mon_petit_secret')
+        const decoded = jwt.verify(token, privateKey)
+        console.log(decoded)
     } catch (err) {
         const message = "Jeton invalide"
         return res.status(403).json({message, data: err})

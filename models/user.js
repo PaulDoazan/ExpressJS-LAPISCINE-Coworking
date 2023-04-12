@@ -7,12 +7,23 @@ module.exports = (sequelize, DataTypes) => {
       },
       username: {
         type: DataTypes.STRING,
+        allowNull: false,
         unique: {
             msg: "Le nom d'utilisateur est déjà pris."
         }
       },
       password: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      roles: {
+        type: DataTypes.STRING,
+        set(roles) {
+          this.setDataValue('roles', roles.join());
+        },
+        get() {
+          return this.getDataValue('roles').split(',');
+        }
       }
     }, {
         timestamps: true,
