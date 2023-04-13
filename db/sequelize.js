@@ -30,39 +30,39 @@ CoworkingModel.hasMany(ReviewModel, {
 ReviewModel.belongsTo(CoworkingModel);
 
 const initDb = () => {
-    return sequelize.sync({ force: true }) 
+    return sequelize.sync() 
     .then(() => {
         // création des 11 coworkings dans la bdd, avec une boucle, 
         // message à afficher en console : La liste des {11} coworkings a bien été créée.
-        coworkings.forEach((element) => {
-            CoworkingModel.create({
-                name: element.name,
-                price: element.price,
-                address: element.address,
-                superficy: element.superficy,
-                capacity: element.capacity,
-            })
-        })
+        // coworkings.forEach((element) => {
+        //     CoworkingModel.create({
+        //         name: element.name,
+        //         price: element.price,
+        //         address: element.address,
+        //         superficy: element.superficy,
+        //         capacity: element.capacity,
+        //     })
+        // })
 
-        bcrypt.hash('mdp', 10)
-            .then((hash) => {
-                UserModel.create({
-                    username: 'paul',
-                    password: hash,
-                    roles: ['user', 'admin']
-                })
-            })
-            .catch(err => console.log(err))
+        // bcrypt.hash('mdp', 10)
+        //     .then((hash) => {
+        //         UserModel.create({
+        //             username: 'paul',
+        //             password: hash,
+        //             roles: ['user', 'admin']
+        //         })
+        //     })
+        //     .catch(err => console.log(err))
 
-        bcrypt.hash('mdp', 10)
-        .then((hash) => {
-            UserModel.create({
-                username: 'pierre',
-                password: hash,
-                roles: ['user']
-            })
-        })
-        .catch(err => console.log(err))
+        // bcrypt.hash('mdp', 10)
+        // .then((hash) => {
+        //     UserModel.create({
+        //         username: 'pierre',
+        //         password: hash,
+        //         roles: ['user']
+        //     })
+        // })
+        // .catch(err => console.log(err))
     })
     .catch(error => console.log('Erreur'))
 }

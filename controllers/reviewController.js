@@ -1,8 +1,10 @@
 const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
-const { ReviewModel } = require('../db/sequelize')
+const { ReviewModel, UserModel, CoworkingModel } = require('../db/sequelize')
 
 exports.findAllReviews = (req, res) => {
-    ReviewModel.findAll() 
+    ReviewModel.findAll({
+        include: [UserModel, CoworkingModel]
+    }) 
         .then(results => {
             const message = "La liste des avis a bien été récupérée"
             res.json({message, data: results})

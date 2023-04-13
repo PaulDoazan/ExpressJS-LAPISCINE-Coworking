@@ -1,6 +1,6 @@
 let coworkings = require('../mock-coworkings');
 const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
-const { CoworkingModel } = require('../db/sequelize')
+const { CoworkingModel, ReviewModel } = require('../db/sequelize')
 
 
 exports.findAllCoworkings = (req, res) => {
@@ -33,7 +33,9 @@ exports.findAllCoworkings = (req, res) => {
 
 exports.findCoworkingByPk = (req, res) => {
     // Afficher le coworking correspondant à l'id en params, en le récupérant dans la bdd     findByPk()
-    CoworkingModel.findByPk(req.params.id)
+    CoworkingModel.findByPk(req.params.id, {
+        include: ReviewModel
+    })
         .then(coworking => {
             if (coworking === null) {
                 const message = `Le coworking demandé n'existe pas.`
@@ -47,6 +49,26 @@ exports.findCoworkingByPk = (req, res) => {
             const message = `La liste des coworkings n'a pas pu se charger. Reessayez ulterieurement.`
             res.status(500).json({ message, data: error })
         })
+}
+
+exports.findAllCoworkingsByReview = (req, res) => {
+    const minRate = req.query.minRate || 4
+    CoworkingModel.findAll({
+        include: {
+            model: ReviewModel,
+            where: {
+                rating: { [Op.gte]: 4 }
+            }
+        }
+    })
+    .then((elements)=>{
+        const msg = 'La liste des coworkings a bien été récupérée en base de données.'
+        res.json({message: msg, data: elements})
+    })
+    .catch((error) => {
+        const msg = 'Une erreur est survenue.'
+        res.status(500).json({message: msg})
+    })
 }
 
 exports.updateCoworking = (req, res) => {
