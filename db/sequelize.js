@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt');
 const { Sequelize, DataTypes } = require('sequelize');
 const CoworkingModelSequelize = require('../models/coworking')
 const UserModelSequelize = require('../models/user')
+const ReviewModelSequelize = require('../models/review')
 const coworkings = require('../mock-coworkings');
 
 const sequelize = new Sequelize('lapiscine_coworking', 'root', '', {
@@ -12,6 +13,21 @@ const sequelize = new Sequelize('lapiscine_coworking', 'root', '', {
 
 const CoworkingModel = CoworkingModelSequelize(sequelize, DataTypes)
 const UserModel = UserModelSequelize(sequelize, DataTypes)
+const ReviewModel = ReviewModelSequelize(sequelize, DataTypes)
+
+UserModel.hasMany(ReviewModel, {
+    foreignKey: {
+        allowNull: false
+    }
+  });
+ReviewModel.belongsTo(UserModel); 
+
+CoworkingModel.hasMany(ReviewModel, {
+    foreignKey: {
+        allowNull: false
+    }
+  });
+ReviewModel.belongsTo(CoworkingModel);
 
 const initDb = () => {
     return sequelize.sync({ force: true }) 
@@ -57,5 +73,5 @@ sequelize.authenticate()
 
 
 module.exports = {
-    sequelize, CoworkingModel, UserModel, initDb
+    sequelize, CoworkingModel, UserModel, initDb, ReviewModel
 }
