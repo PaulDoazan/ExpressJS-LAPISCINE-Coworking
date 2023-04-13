@@ -5,7 +5,7 @@ const sequelize = require('./db/sequelize')
 const app = express()
 const port = 3000
 
-//sequelize.initDb();
+sequelize.initDb();
 
 app
     .use(morgan('dev'))

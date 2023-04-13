@@ -43,6 +43,12 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         timestamps: true,
         createdAt: 'created',
-        updatedAt: false
-    })
+        updatedAt: false,
+        scopes: {
+          withoutPassword: {
+              attributes: { exclude: ['password'] },
+          }
+      }
+    },
+    )
   }

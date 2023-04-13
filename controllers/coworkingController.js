@@ -1,6 +1,6 @@
 let coworkings = require('../mock-coworkings');
-const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
-const { CoworkingModel, ReviewModel } = require('../db/sequelize')
+const { Op, UniqueConstraintError, ValidationError, QueryTypes } = require('sequelize');
+const { CoworkingModel, ReviewModel, sequelize } = require('../db/sequelize')
 
 
 exports.findAllCoworkings = (req, res) => {
@@ -69,6 +69,22 @@ exports.findAllCoworkingsByReview = (req, res) => {
         const msg = 'Une erreur est survenue.'
         res.status(500).json({message: msg})
     })
+}
+
+exports.findAllCoworkingsByReviewSQL = (req, res) => {
+    return sequelize.query('SELECT name, rating FROM `coworkings` LEFT JOIN `reviews` ON `coworkings`.`id` = `reviews`.`coworkingId`',
+        {
+            type: QueryTypes.SELECT
+        }
+    )
+        .then(coworkings => {
+            const message = `Il y a ${coworkings.length} coworkings comme résultat de la requête en SQL pur.`
+            res.json({ message, data: coworkings })
+        })
+        .catch(error => {
+            const message = `La liste des coworkings n'a pas pu se charger. Reessayez ulterieurement.`
+            res.status(500).json({ message, data: error })
+        })
 }
 
 exports.updateCoworking = (req, res) => {

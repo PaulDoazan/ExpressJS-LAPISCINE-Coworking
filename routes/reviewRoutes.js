@@ -8,4 +8,8 @@ router
     .get(reviewController.findAllReviews)
     .post(authController.protect, reviewController.createReview)
 
+router
+    .route('/:id')
+    .put(authController.protect, authController.restrictToOwnUser, reviewController.updateReview)
+
 module.exports = router;

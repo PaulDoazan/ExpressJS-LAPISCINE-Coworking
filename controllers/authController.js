@@ -1,5 +1,5 @@
 const { Op, UniqueConstraintError, ValidationError } = require('sequelize');
-const { UserModel } = require('../db/sequelize')
+const { UserModel, ReviewModel } = require('../db/sequelize')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const privateKey = require('../auth/private_key')
@@ -98,4 +98,23 @@ exports.restrictTo = (...roles) => {
                 res.status(500).json({message, data: err})
             })    
     }
+}
+
+exports.restrictToOwnUser = (req, res, next) => {
+    ReviewModel.findByPk(req.params.id)
+        .then(review => { 
+            if(!review){
+                const message = `Le commentaire n°${req.params.id} n'existe pas`
+                return res.status(404).json({message})
+            }
+            if(review.UserId != req.userId){
+                const message = "Tu n'es pas le créateur de cette ressource";
+                return res.status(403).json({message}) 
+            }
+            return next();
+        })
+        .catch(err => {
+            const message = "Erreur lors de l'autorisation"
+            res.status(500).json({message, data: err})
+        })    
 }
